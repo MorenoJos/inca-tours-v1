@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${idioma.id != null} ? 'Editar Idioma' : 'Registrar Idioma'">Formulario Idioma</title>
+</head>
+<body>
+
+<h2 th:text="${idioma.id != null} ? 'Editar Idioma' : 'Registrar Nuevo Idioma'"></h2>
+
+<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+
+<div sec:authorize="hasRole('ADMIN')">
+
+    <form th:action="@{/idiomas/guardar}" th:object="${idioma}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <label>Nombre del Idioma:</label>
+        <input type="text" th:field="*{nombre}" required/><br/><br/>
+        <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red"></span>
+
+        <button type="submit" th:text="${idioma.id != null} ? 'Actualizar' : 'Guardar'">Guardar</button>
+    </form>
+
+    <br/>
+    <a th:href="@{/idiomas/lista}">← Volver a la lista de idiomas</a>
+</div>
+
+</body>
+</html>

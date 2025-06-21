@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Idiomas</title>
+</head>
+<body>
+
+<h2>Idiomas Registrados</h2>
+
+<p>Usuario: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+
+<!-- Mensajes -->
+<div th:if="${param.exito}">
+  <p style="color: green;">¡Idioma registrado correctamente!</p>
+</div>
+<div th:if="${param.editado}">
+  <p style="color: green;">¡Idioma actualizado correctamente!</p>
+</div>
+<div th:if="${param.eliminado}">
+  <p style="color: red;">¡Idioma eliminado correctamente!</p>
+</div>
+<div th:if="${param.error}">
+  <p style="color: red;">Error: idioma no encontrado.</p>
+</div>
+
+<div sec:authorize="hasRole('ADMIN')">
+  <a th:href="@{/idiomas/nuevo}">Registrar nuevo idioma</a>
+  <br/><br/>
+
+  <table border="1">
+    <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="idioma : ${idiomas}">
+      <td th:text="${idioma.nombre}">Idioma</td>
+      <td>
+        <a th:href="@{'/idiomas/editar/' + ${idioma.id}}">Editar</a> |
+        <a th:href="@{'/idiomas/eliminar/' + ${idioma.id}}"
+           onclick="return confirm('¿Estás seguro de eliminar este idioma?');">Eliminar</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div sec:authorize="!hasRole('ADMIN')">
+  <p>No tienes permiso para ver esta sección.</p>
+</div>
+
+</body>
+</html>

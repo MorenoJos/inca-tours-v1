@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Lista de Tours</title>
+    <meta charset="UTF-8">
+    <style>
+        .pagina-activa {
+            font-weight: bold;
+            color: green;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 👋 Bienvenida y roles -->
+<p>Bienvenido, <strong><span sec:authentication="name"></span></strong>
+    | Rol: <span sec:authentication="principal.authorities"></span>
+</p>
+
+<h1>Lista de Tours Registrados</h1>
+
+<!-- Mensajes de feedback -->
+<div th:if="${param.exito}">
+    <p style="color: green;">✅ ¡Tour registrado correctamente!</p>
+</div>
+<div th:if="${param.editado}">
+    <p style="color: blue;">✏️ ¡Tour editado exitosamente!</p>
+</div>
+<div th:if="${param.eliminado}">
+    <p style="color: red;">🗑️ ¡Tour eliminado exitosamente!</p>
+</div>
+<div th:if="${param.error}">
+    <p style="color: red;">Ocurrió un error. Intenta nuevamente.</p>
+</div>
+
+<!-- Tabla de tours -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Duración</th>
+        <th>Pasajeros</th>
+        <th>Fecha y Hora de Inicio</th>
+        <th>Estado</th>
+        <th>Guía Asignado</th>
+        <th>Editar</th>
+        <th>Eliminar</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="tour : ${toursPage.content}">
+        <td th:text="${tour.nombre}"></td>
+        <td th:text="${tour.tipo}"></td>
+        <td th:text="|${tour.duracionHoras}h|"></td>
+        <td th:text="${tour.cantidadPasajeros}"></td>
+        <td th:text="${#temporals.format(tour.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${tour.estado}"></td>
+        <td th:text="${tour.guiaAsignado != null ? tour.guiaAsignado.nombre : 'No asignado'}"></td>
+        <td><a th:href="@{'/tours/editar/' + ${tour.id}}">Editar</a></td>
+        <td><a th:href="@{'/tours/eliminar/' + ${tour.id}}" onclick="return confirm('¿Estás seguro de eliminar este tour?');">Eliminar</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Botón para registrar nuevo tour -->
+<div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
+    <br/>
+    <a th:href="@{/tours/nuevo}">Registrar nuevo tour</a>
+</div>
+
+<!-- Paginación -->
+<div th:if="${totalPages > 1}" style="margin-top: 20px;">
+    <p>Página:
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/tours/lista(page=${i})}"
+               th:text="${i + 1}"
+               th:class="${i == currentPage} ? 'pagina-activa' : ''"
+               style="margin: 0 5px;"></a>
+        </span>
+    </p>
+
+    <div>
+        <span th:if="${currentPage > 0}">
+            <a th:href="@{/tours/lista(page=${currentPage - 1})}">← Anterior</a>
+        </span>
+        |
+        <span th:if="${currentPage < totalPages - 1}">
+            <a th:href="@{/tours/lista(page=${currentPage + 1})}">Siguiente →</a>
+        </span>
+    </div>
+</div>
+
+<!-- Cerrar sesión -->
+<div sec:authorize="isAuthenticated()">
+    <br/>
+    <!--<a th:href="@{/logout}">Cerrar sesión</a>-->
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+        <button type="submit" style="background:none;border:none;color:blue;text-decoration:underline;cursor:pointer;">Cerrar sesión</button>
+    </form>
+</div>
+
+</body>
+</html>
+

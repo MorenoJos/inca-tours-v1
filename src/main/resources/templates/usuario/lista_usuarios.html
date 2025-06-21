@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Lista de Usuarios</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<p>Bienvenido, <strong><span sec:authentication="name"></span></strong>
+    | Rol: <span sec:authentication="principal.authorities"></span>
+</p>
+
+<h2>Usuarios Registrados</h2>
+
+<div th:if="${param.exito}">
+    <p style="color: green;">✅ ¡Usuario registrado correctamente!</p>
+</div>
+<div th:if="${param.editado}">
+    <p style="color: blue;">✏️ ¡Usuario actualizado correctamente!</p>
+</div>
+<div th:if="${param.eliminado}">
+    <p style="color: red;">🗑️ ¡Usuario eliminado correctamente!</p>
+</div>
+<div th:if="${param.error}">
+    <p style="color: red;">⚠️ Error: el usuario no fue encontrado.</p>
+</div>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>DNI</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="usuario : ${usuarios}">
+        <td th:text="${usuario.nombre}">Nombre</td>
+        <td th:text="${usuario.dni}">DNI</td>
+        <td th:text="${usuario.correo}">Correo</td>
+        <td th:text="${usuario.telefono}">Teléfono</td>
+        <td th:text="${usuario.rol}">Rol</td>
+        <td>
+            <a th:href="@{'/usuarios/editar/' + ${usuario.id}}">Editar</a> |
+            <a th:href="@{'/usuarios/eliminar/' + ${usuario.id}}"
+               onclick="return confirm('¿Estás seguro de eliminar este usuario?');">Eliminar</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Navegación de páginas -->
+<div>
+    <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+        <a th:href="@{'/usuarios/lista?page=' + ${i}}" th:text="${i + 1}"
+           th:class="${i == paginaActual} ? 'actual' : ''">Número</a>
+        <span th:if="${i < totalPaginas - 1}"> | </span>
+    </span>
+</div>
+
+<div sec:authorize="hasRole('ADMIN')">
+    <br/>
+    <a th:href="@{/usuarios/nuevo}">Registrar nuevo usuario</a>
+</div>
+
+<div sec:authorize="isAuthenticated()">
+    <br/>
+    <a th:href="@{/logout}">Cerrar sesión</a>
+</div>
+
+</body>
+</html>

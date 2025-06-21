@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="${guia.id != null} ? 'Editar Guía' : 'Registrar Guía'">Formulario Guía</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h1 th:text="${guia.id != null} ? 'Editar Guía' : 'Registrar Nuevo Guía'">Formulario Guía</h1>
+
+<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+
+<div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
+
+    <form th:action="${${guia.id != null} ? '/guias/actualizar' : '/guias/guardar'}"
+          th:object="${guia}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" required/>
+        <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red"></span><br/>
+
+        <label>DNI:</label>
+        <input type="text" th:field="*{dni}" required/>
+        <span th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" style="color:red"></span><br/>
+
+        <label>Correo:</label>
+        <input type="email" th:field="*{correo}" required/>
+        <span th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" style="color:red"></span><br/>
+
+        <label>Teléfono:</label>
+        <input type="text" th:field="*{telefono}" required/>
+        <span th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color:red"></span><br/>
+
+        <label>Idiomas:</label><br/>
+        <div th:each="idioma : ${idiomas}">
+            <input type="checkbox" th:value="${idioma.id}" th:field="*{idiomas}"/>
+            <span th:text="${idioma.nombre}"></span>
+        </div>
+        <span th:if="${#fields.hasErrors('idiomas')}" th:errors="*{idiomas}" style="color:red"></span><br/>
+
+        <button type="submit" th:text="${guia.id != null} ? 'Actualizar' : 'Guardar'">Guardar</button>
+    </form>
+
+    <div th:if="${param.exito}">
+        <p style="color: green;">¡Guía registrado correctamente!</p>
+    </div>
+    <div th:if="${param.editado}">
+        <p style="color: green;">¡Guía actualizado correctamente!</p>
+    </div>
+    <div th:if="${param.error}">
+        <p style="color: red;">Ocurrió un error. Intenta nuevamente.</p>
+    </div>
+
+    <a th:href="@{/guias/lista}">← Volver a la lista de guías</a>
+
+</div>
+
+</body>
+</html>

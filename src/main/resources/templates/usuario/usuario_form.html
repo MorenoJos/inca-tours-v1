@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="${usuario.id != null} ? 'Editar Usuario' : 'Registrar Usuario'">Formulario Usuario</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h2 th:text="${usuario.id != null} ? 'Editar Usuario' : 'Registrar Nuevo Usuario'"></h2>
+
+<!-- Mostrar quién está logueado -->
+<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+
+<div sec:authorize="hasRole('ADMIN')">
+
+    <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+        <!-- Campo oculto para edición -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <label>Nombre:</label><br/>
+        <input type="text" th:field="*{nombre}" required/>
+        <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: red"></div>
+        <br/>
+
+        <label>DNI:</label><br/>
+        <input type="text" th:field="*{dni}" required/>
+        <div th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" style="color: red"></div>
+        <br/>
+
+        <label>Correo:</label><br/>
+        <input type="email" th:field="*{correo}" required/>
+        <div th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" style="color: red"></div>
+        <br/>
+
+        <label>Teléfono:</label><br/>
+        <input type="tel" th:field="*{telefono}" required/>
+        <div th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color: red"></div>
+        <br/>
+
+        <label>Contraseña:</label><br/>
+        <input type="password" th:field="*{password}"
+               th:placeholder="${usuario.id != null} ? 'Dejar en blanco si no desea cambiarla' : ''" />
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red"></div>
+        <br/>
+
+        <label>Rol:</label><br/>
+        <select th:field="*{rol}" required>
+            <option value="" disabled selected>Seleccionar rol</option>
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+        </select>
+        <div th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}" style="color: red"></div>
+        <br/><br/>
+
+        <button type="submit" th:text="${usuario.id != null} ? 'Actualizar' : 'Guardar'">Guardar</button>
+    </form>
+
+    <!-- Mensajes de éxito -->
+    <div th:if="${param.exito}">
+        <p style="color: green;">¡Usuario registrado correctamente!</p>
+    </div>
+    <div th:if="${param.editado}">
+        <p style="color: green;">¡Usuario actualizado correctamente!</p>
+    </div>
+
+    <a th:href="@{/usuarios/lista}">← Volver a la lista de usuarios</a>
+</div>
+
+</body>
+</html>

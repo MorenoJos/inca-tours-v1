@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Error</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h2>Error inesperado</h2>
+<p th:text="${mensajeError}">Algo salió mal.</p>
+<a th:href="@{/login}">Volver al inicio</a>
+</body>
+</html>

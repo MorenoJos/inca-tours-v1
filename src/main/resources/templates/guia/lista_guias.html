@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Guías</title>
+</head>
+<body>
+
+<h2>Guías Registrados</h2>
+
+<div th:if="${param.exito}">
+    <p style="color: green;">¡Guía registrado correctamente!</p>
+</div>
+<div th:if="${param.editado}">
+    <p style="color: green;">¡Guía actualizado correctamente!</p>
+</div>
+<div th:if="${param.eliminado}">
+    <p style="color: green;">¡Guía eliminado correctamente!</p>
+</div>
+
+<p>Usuario: <span sec:authentication="name"></span> |
+    Rol: <span sec:authentication="principal.authorities"></span></p>
+
+<div sec:authorize="hasRole('ADMIN') or hasRole('USER')">
+
+    <a th:href="@{/guias/nuevo}">Registrar nuevo guía</a>
+    <br/><br/>
+
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>DNI</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Idiomas</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="guia : ${guias}">
+            <td th:text="${guia.nombre}">Nombre</td>
+            <td th:text="${guia.dni}">DNI</td>
+            <td th:text="${guia.correo}">Correo</td>
+            <td th:text="${guia.telefono}">Teléfono</td>
+            <td>
+                <ul>
+                    <li th:each="idioma : ${guia.idiomas}" th:text="${idioma.nombre}">Idioma</li>
+                </ul>
+            </td>
+            <td>
+                <a th:href="@{'/guias/editar/' + ${guia.id}}">Editar</a> |
+                <a th:href="@{'/guias/eliminar/' + ${guia.id}}"
+                   onclick="return confirm('¿Estás seguro de que deseas eliminar este guía?');">Eliminar</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div>
+        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:href="@{'/guias/lista?page=' + ${i}}" th:text="${i + 1}"
+               th:class="${i == paginaActual} ? 'actual' : ''">Número</a>
+            <span th:if="${i < totalPaginas - 1}"> | </span>
+        </span>
+    </div>
+
+</div>
+
+<div sec:authorize="!isAuthenticated()">
+    <p>No tienes permiso para ver esta página. Por favor,
+        <a th:href="@{/login}">inicia sesión</a>.</p>
+</div>
+
+</body>
+</html>

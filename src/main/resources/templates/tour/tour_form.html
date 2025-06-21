@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Registrar Tour</title>
+</head>
+<body>
+
+<h1 th:text="${tour.id != null} ? 'Editar Tour' : 'Registrar Tour'"></h1>
+
+<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+
+<div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
+    <form th:action="@{/tours/guardar}" th:object="${tour}" method="post">
+
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" required/><br/>
+        <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red;"></span>
+
+        <label>Tipo:</label>
+        <input type="text" th:field="*{tipo}" required/><br/>
+        <span th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}" style="color:red;"></span>
+
+        <label>Duración (horas):</label>
+        <input type="number" th:field="*{duracionHoras}" required/><br/>
+        <span th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}" style="color:red;"></span>
+
+        <label>Pasajeros:</label>
+        <input type="number" th:field="*{cantidadPasajeros}" required/><br/>
+        <span th:if="${#fields.hasErrors('cantidadPasajeros')}" th:errors="*{cantidadPasajeros}" style="color:red;"></span>
+
+        <label>Fecha y hora de inicio:</label>
+        <input type="datetime-local" th:field="*{fechaHoraInicio}" required/><br/>
+        <span th:if="${#fields.hasErrors('fechaHoraInicio')}" th:errors="*{fechaHoraInicio}" style="color:red;"></span>
+
+        <label>Guía asignado:</label>
+        <select th:field="*{guiaAsignado}">
+            <option th:each="g : ${guiaList}" th:value="${g.id}" th:text="${g.nombre}"></option>
+        </select><br/>
+        <span th:if="${#fields.hasErrors('guiaAsignado')}" th:errors="*{guiaAsignado}" style="color:red;"></span>
+
+        <label>Estado inicial:</label>
+        <select th:field="*{estado}">
+            <option th:each="estado : ${estadoList}" th:value="${estado}" th:text="${estado}"></option>
+        </select><br/>
+
+        <button type="submit">Guardar</button>
+    </form>
+
+    <div th:if="${param.exito}">
+        <p style="color: green;">¡Tour registrado correctamente!</p>
+    </div>
+</div>
+
+</body>
+</html>
