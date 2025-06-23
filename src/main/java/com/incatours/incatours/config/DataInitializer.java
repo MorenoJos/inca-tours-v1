@@ -17,20 +17,26 @@ public class DataInitializer implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
-        if (usuarioRepository.findByCorreo("admin@incatours.com").isEmpty()) {
-            Usuario admin = new Usuario();
-            admin.setNombre("Administrador");
-            admin.setDni("00000000");
-            admin.setCorreo("admin@incatours.com");
-            admin.setTelefono("999999999");
-            admin.setPassword(passwordEncoder.encode("admin123")); // Puedes cambiarla
-            admin.setRol("ADMIN");
+    public void run(String... args) {
+        crearUsuarioSiNoExiste("admin@incatours.com", "Administrador", "00000000", "999999999", "admin123", "ADMIN");
+        crearUsuarioSiNoExiste("usuario@incatours.com", "Usuario Prueba", "11111111", "987654321", "user123", "USER");
+    }
 
-            usuarioRepository.save(admin);
-            System.out.println("✅ Usuario ADMIN creado con éxito.");
-        } else {
-            System.out.println("ℹ️ Ya existe un admin, no se creó otro.");
-        }
+    private void crearUsuarioSiNoExiste(String correo, String nombre, String dni, String telefono, String clave, String rol) {
+        usuarioRepository.findByCorreo(correo).ifPresentOrElse(
+                u -> System.out.printf("ℹ️ Ya existe un usuario con correo %s, no se creó otro.%n", correo),
+                () -> {
+                    Usuario nuevo = new Usuario();
+                    nuevo.setCorreo(correo);
+                    nuevo.setNombre(nombre);
+                    nuevo.setDni(dni);
+                    nuevo.setTelefono(telefono);
+                    nuevo.setPassword(passwordEncoder.encode(clave));
+                    nuevo.setRol(rol);
+
+                    usuarioRepository.save(nuevo);
+                    System.out.printf("✅ Usuario con rol %s creado con éxito.%n", rol);
+                }
+        );
     }
 }

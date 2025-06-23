@@ -1,0 +1,28 @@
+{
+  "name": "inca-tours-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tailwind:dev": "tailwindcss-cli -i ./src/tailwind/input.css -o ./src/main/resources/static/css/app.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MorenoJos/inca-tours-v1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MorenoJos/inca-tours-v1/issues"
+  },
+  "homepage": "https://github.com/MorenoJos/inca-tours-v1#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.10",
+    "tailwindcss-cli": "^0.1.2"
+  }
+}

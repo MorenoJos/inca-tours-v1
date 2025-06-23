@@ -2,60 +2,92 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title th:text="${guia.id != null} ? 'Editar Guía' : 'Registrar Guía'">Formulario Guía</title>
     <meta charset="UTF-8">
+    <title th:text="${guia.id != null} ? 'Editar Guía' : 'Registrar Guía'"></title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
 
-<h1 th:text="${guia.id != null} ? 'Editar Guía' : 'Registrar Nuevo Guía'">Formulario Guía</h1>
+<!-- Contenido principal -->
+<main class="flex-grow max-w-3xl w-full mx-auto px-4 py-6">
 
-<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
-
-<div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
-
-    <form th:action="${${guia.id != null} ? '/guias/actualizar' : '/guias/guardar'}"
-          th:object="${guia}" method="post">
-        <input type="hidden" th:field="*{id}"/>
-
-        <label>Nombre:</label>
-        <input type="text" th:field="*{nombre}" required/>
-        <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red"></span><br/>
-
-        <label>DNI:</label>
-        <input type="text" th:field="*{dni}" required/>
-        <span th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" style="color:red"></span><br/>
-
-        <label>Correo:</label>
-        <input type="email" th:field="*{correo}" required/>
-        <span th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" style="color:red"></span><br/>
-
-        <label>Teléfono:</label>
-        <input type="text" th:field="*{telefono}" required/>
-        <span th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color:red"></span><br/>
-
-        <label>Idiomas:</label><br/>
-        <div th:each="idioma : ${idiomas}">
-            <input type="checkbox" th:value="${idioma.id}" th:field="*{idiomas}"/>
-            <span th:text="${idioma.nombre}"></span>
-        </div>
-        <span th:if="${#fields.hasErrors('idiomas')}" th:errors="*{idiomas}" style="color:red"></span><br/>
-
-        <button type="submit" th:text="${guia.id != null} ? 'Actualizar' : 'Guardar'">Guardar</button>
-    </form>
-
-    <div th:if="${param.exito}">
-        <p style="color: green;">¡Guía registrado correctamente!</p>
-    </div>
-    <div th:if="${param.editado}">
-        <p style="color: green;">¡Guía actualizado correctamente!</p>
-    </div>
-    <div th:if="${param.error}">
-        <p style="color: red;">Ocurrió un error. Intenta nuevamente.</p>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+        <h1 class="text-2xl font-bold text-indigo-700" th:text="${guia.id != null} ? '✏️ Editar Guía' : '🧭 Registrar Guía'"></h1>
+        <a th:href="@{/}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">🏠 Inicio</a>
     </div>
 
-    <a th:href="@{/guias/lista}">← Volver a la lista de guías</a>
+    <!-- Fragmento de mensajes -->
+    <div th:replace="fragmentos/mensajes :: mensajes"></div>
 
-</div>
+    <!-- Formulario -->
+    <div class="bg-white p-6 rounded shadow-md border">
+        <form th:action="${guia.id != null} ? '/guias/actualizar' : '/guias/guardar'"
+              th:object="${guia}" method="post" class="space-y-5">
+
+            <input type="hidden" th:field="*{id}"/>
+
+            <!-- Nombre -->
+            <div>
+                <label class="block font-medium">Nombre:</label>
+                <input type="text" th:field="*{nombre}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- DNI -->
+            <div>
+                <label class="block font-medium">DNI:</label>
+                <input type="text" th:field="*{dni}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Correo -->
+            <div>
+                <label class="block font-medium">Correo:</label>
+                <input type="email" th:field="*{correo}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label class="block font-medium">Teléfono:</label>
+                <input type="text" th:field="*{telefono}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Idiomas (Select múltiple) -->
+            <div>
+                <label class="block font-medium">Idiomas:</label>
+                <select multiple th:field="*{idiomas}" class="w-full border rounded px-3 py-2 mt-1 h-40">
+                    <option th:each="idioma : ${idiomas}" th:value="${idioma.id}" th:text="${idioma.nombre}"></option>
+                </select>
+                <p th:if="${#fields.hasErrors('idiomas')}" th:errors="*{idiomas}" class="text-red-600 text-sm mt-1"></p>
+                <p class="text-sm text-gray-500 mt-1">Mantén presionado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</p>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-between items-center pt-4">
+                <button type="button"
+                        onclick="if(confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.')) window.location.href='/guias/lista';"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded shadow transition">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        th:text="${guia.id != null} ? 'Actualizar' : 'Guardar'"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded transition">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="text-center text-sm text-gray-500 py-6 mt-auto">
+    © 2025 Inca Tours. Todos los derechos reservados.
+</footer>
 
 </body>
 </html>

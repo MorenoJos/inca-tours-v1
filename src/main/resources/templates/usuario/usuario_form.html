@@ -2,70 +2,107 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title th:text="${usuario.id != null} ? 'Editar Usuario' : 'Registrar Usuario'">Formulario Usuario</title>
     <meta charset="UTF-8">
+    <title th:text="(${usuario.id} != null) ? 'Editar Usuario' : 'Registrar Usuario'">Formulario Usuario</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen px-4 py-6">
 
-<h2 th:text="${usuario.id != null} ? 'Editar Usuario' : 'Registrar Nuevo Usuario'"></h2>
+<div class="max-w-2xl mx-auto">
 
-<!-- Mostrar quién está logueado -->
-<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
-
-<div sec:authorize="hasRole('ADMIN')">
-
-    <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
-        <!-- Campo oculto para edición -->
-        <input type="hidden" th:field="*{id}"/>
-
-        <label>Nombre:</label><br/>
-        <input type="text" th:field="*{nombre}" required/>
-        <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: red"></div>
-        <br/>
-
-        <label>DNI:</label><br/>
-        <input type="text" th:field="*{dni}" required/>
-        <div th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" style="color: red"></div>
-        <br/>
-
-        <label>Correo:</label><br/>
-        <input type="email" th:field="*{correo}" required/>
-        <div th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" style="color: red"></div>
-        <br/>
-
-        <label>Teléfono:</label><br/>
-        <input type="tel" th:field="*{telefono}" required/>
-        <div th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color: red"></div>
-        <br/>
-
-        <label>Contraseña:</label><br/>
-        <input type="password" th:field="*{password}"
-               th:placeholder="${usuario.id != null} ? 'Dejar en blanco si no desea cambiarla' : ''" />
-        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red"></div>
-        <br/>
-
-        <label>Rol:</label><br/>
-        <select th:field="*{rol}" required>
-            <option value="" disabled selected>Seleccionar rol</option>
-            <option value="USER">USER</option>
-            <option value="ADMIN">ADMIN</option>
-        </select>
-        <div th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}" style="color: red"></div>
-        <br/><br/>
-
-        <button type="submit" th:text="${usuario.id != null} ? 'Actualizar' : 'Guardar'">Guardar</button>
-    </form>
-
-    <!-- Mensajes de éxito -->
-    <div th:if="${param.exito}">
-        <p style="color: green;">¡Usuario registrado correctamente!</p>
-    </div>
-    <div th:if="${param.editado}">
-        <p style="color: green;">¡Usuario actualizado correctamente!</p>
+    <!-- Encabezado -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+        <h1 th:text="${usuario.id != null} ? '✏️ Editar Usuario' : '👤 Registrar Usuario'"
+            class="text-2xl font-bold text-indigo-700"></h1>
+        <a th:href="@{/home}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">
+            🏠 Volver al inicio
+        </a>
     </div>
 
-    <a th:href="@{/usuarios/lista}">← Volver a la lista de usuarios</a>
+    <!-- Mensajes -->
+    <div th:replace="~{fragmentos/mensajes :: mensajes}"></div>
+
+    <!-- Formulario -->
+    <div class="bg-white p-6 rounded shadow">
+        <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post" id="usuarioForm" class="space-y-4">
+            <input type="hidden" th:field="*{id}" />
+
+            <!-- Nombre -->
+            <div>
+                <label class="block font-semibold">Nombre:</label>
+                <input type="text" th:field="*{nombre}" required
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-red-600 text-sm"></span>
+            </div>
+
+            <!-- DNI -->
+            <div>
+                <label class="block font-semibold">DNI:</label>
+                <input type="text" th:field="*{dni}" required
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <span th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}" class="text-red-600 text-sm"></span>
+            </div>
+
+            <!-- Correo -->
+            <div>
+                <label class="block font-semibold">Correo:</label>
+                <input type="email" th:field="*{correo}" required
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <span th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" class="text-red-600 text-sm"></span>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label class="block font-semibold">Teléfono:</label>
+                <input type="tel" th:field="*{telefono}" required
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <span th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="text-red-600 text-sm"></span>
+            </div>
+
+            <!-- Contraseña -->
+            <div>
+                <label class="block font-semibold">Contraseña:</label>
+                <input type="password" th:field="*{password}"
+                       th:placeholder="${usuario.id != null} ? 'Dejar en blanco si no desea cambiarla' : ''"
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-red-600 text-sm"></span>
+            </div>
+
+            <!-- Rol -->
+            <div>
+                <label class="block font-semibold">Rol:</label>
+                <select th:field="*{rol}" required
+                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <option value="" disabled>Seleccionar rol</option>
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+                <span th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}" class="text-red-600 text-sm"></span>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-between pt-4">
+                <button type="button" onclick="confirmarCancelar()"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        th:text="${usuario.id != null} ? 'Actualizar' : 'Guardar'"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded transition font-medium">
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<!-- Confirmación al cancelar -->
+<script>
+    function confirmarCancelar() {
+        if (confirm("¿Deseas salir sin guardar los cambios?")) {
+            window.location.href = "/usuarios/lista";
+        }
+    }
+</script>
 
 </body>
 </html>

@@ -1,30 +1,44 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Iniciar Sesión</title>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión | Inca Tours</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
 </head>
-<body>
-<h2>Login</h2>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<form th:action="@{/login}" method="post">
-    <div>
-        <label>Usuario:</label>
-        <input type="text" name="username"/>
-    </div>
-    <div>
-        <label>Contraseña:</label>
-        <input type="password" name="password"/>
-    </div>
-    <div>
-        <button type="submit">Ingresar</button>
-    </div>
-    <div th:if="${param.error}">
-        <p style="color:red">Usuario o contraseña incorrectos</p>
-    </div>
-    <div th:if="${param.logout}">
-        <p style="color:green">Sesión cerrada exitosamente</p>
-    </div>
-</form>
+<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Iniciar Sesión</h1>
+
+    <form th:action="@{/login}" method="post" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Usuario</label>
+            <input type="text" name="username"
+                   class="w-full mt-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200"
+                   placeholder="Correo o usuario" required>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input type="password" name="password"
+                   class="w-full mt-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200"
+                   placeholder="••••••••" required>
+        </div>
+
+        <div class="text-center">
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+                Ingresar
+            </button>
+        </div>
+    </form>
+
+    <!-- Fragmento de mensajes -->
+    <div th:replace="fragmentos/mensajes :: mensajes"></div>
+
+</div>
 
 </body>
 </html>
+
+

@@ -1,0 +1,41 @@
+<!-- fragmentos/mensajes.html -->
+<div th:fragment="mensajes">
+
+    <div th:if="${param.error}" id="mensaje-error"
+         class="alert alert-error">
+        ⚠️ Usuario o contraseña incorrectos.
+    </div>
+
+    <div th:if="${param.logout}" id="mensaje-logout"
+         class="alert alert-success">
+        ✅ Sesión cerrada exitosamente.
+    </div>
+
+    <div th:if="${param.exito}" id="mensaje-exito"
+         class="alert alert-success">
+        ✅ Operación realizada correctamente.
+    </div>
+
+    <div th:if="${param.editado}" id="mensaje-editado"
+         class="alert alert-info">
+        ✏️ Información actualizada correctamente.
+    </div>
+
+    <div th:if="${param.eliminado}" id="mensaje-eliminado"
+         class="alert alert-error">
+        🗑️ Registro eliminado.
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const mensajes = document.querySelectorAll('[id^="mensaje-"]');
+            mensajes.forEach(el => el.style.display = 'none');
+
+            if (window.history.replaceState) {
+                const url = new URL(window.location);
+                url.search = '';
+                window.history.replaceState({}, document.title, url);
+            }
+        }, 3000);
+    </script>
+</div>

@@ -4,27 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${idioma.id != null} ? 'Editar Idioma' : 'Registrar Idioma'">Formulario Idioma</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 min-h-screen">
 
-<h2 th:text="${idioma.id != null} ? 'Editar Idioma' : 'Registrar Nuevo Idioma'"></h2>
+<!-- Contenedor principal centrado -->
+<div class="max-w-4xl mx-auto px-4 py-6">
 
-<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+    <!-- Header estilizado -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+        <h1 class="text-2xl font-bold text-indigo-700" th:text="${idioma.id != null} ? '✏️ Editar Idioma' : '➕ Registrar Nuevo Idioma'">Formulario</h1>
+        <a th:href="@{/home}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">
+            🏠 Volver al inicio
+        </a>
+    </div>
 
-<div sec:authorize="hasRole('ADMIN')">
+    <!-- Fragmento de mensajes -->
+    <div th:replace="~{fragmentos/mensajes :: mensajes}"></div>
 
-    <form th:action="@{/idiomas/guardar}" th:object="${idioma}" method="post">
-        <input type="hidden" th:field="*{id}" />
+    <!-- Formulario -->
+    <div class="bg-white p-6 rounded shadow">
+        <form th:action="@{/idiomas/guardar}" th:object="${idioma}" method="post" class="space-y-6">
 
-        <label>Nombre del Idioma:</label>
-        <input type="text" th:field="*{nombre}" required/><br/><br/>
-        <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red"></span>
+            <!-- ID oculto -->
+            <input type="hidden" th:field="*{id}" />
 
-        <button type="submit" th:text="${idioma.id != null} ? 'Actualizar' : 'Guardar'">Guardar</button>
-    </form>
+            <!-- Nombre del idioma -->
+            <div>
+                <label class="block font-semibold">Nombre del Idioma:</label>
+                <input type="text" th:field="*{nombre}" required class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"/>
+                <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-red-600 text-sm"></span>
+            </div>
 
-    <br/>
-    <a th:href="@{/idiomas/lista}">← Volver a la lista de idiomas</a>
+            <!-- Botones -->
+            <div class="flex justify-between items-center pt-6">
+                <button type="button"
+                        onclick="if(confirm('¿Seguro que deseas cancelar y volver a la lista de idiomas?')) window.location.href='/idiomas/lista';"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded transition">
+                    Cancelar
+                </button>
+
+                <button type="submit" th:text="${idioma.id != null} ? 'Actualizar' : 'Guardar'"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded transition">
+                    Guardar
+                </button>
+            </div>
+
+        </form>
+    </div>
+
 </div>
 
 </body>

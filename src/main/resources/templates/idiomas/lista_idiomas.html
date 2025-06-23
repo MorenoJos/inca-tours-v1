@@ -4,53 +4,62 @@
 <head>
   <meta charset="UTF-8">
   <title>Lista de Idiomas</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 min-h-screen">
 
-<h2>Idiomas Registrados</h2>
+<!-- Contenedor principal centrado -->
+<div class="max-w-5xl mx-auto px-4 py-6">
 
-<p>Usuario: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
+  <!-- Header estilizado -->
+  <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+    <h1 class="text-2xl font-bold text-indigo-700">🌍 Idiomas Registrados</h1>
+    <a th:href="@{/home}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">
+      🏠 Volver al inicio
+    </a>
+  </div>
 
-<!-- Mensajes -->
-<div th:if="${param.exito}">
-  <p style="color: green;">¡Idioma registrado correctamente!</p>
-</div>
-<div th:if="${param.editado}">
-  <p style="color: green;">¡Idioma actualizado correctamente!</p>
-</div>
-<div th:if="${param.eliminado}">
-  <p style="color: red;">¡Idioma eliminado correctamente!</p>
-</div>
-<div th:if="${param.error}">
-  <p style="color: red;">Error: idioma no encontrado.</p>
-</div>
+  <!-- Fragmento de mensajes -->
+  <div th:replace="~{fragmentos/mensajes :: mensajes}"></div>
 
-<div sec:authorize="hasRole('ADMIN')">
-  <a th:href="@{/idiomas/nuevo}">Registrar nuevo idioma</a>
-  <br/><br/>
+  <!-- Botón nuevo idioma -->
+  <div class="mb-4 text-right" sec:authorize="hasRole('ADMIN')">
+    <a th:href="@{/idiomas/nuevo}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+      ➕ Registrar nuevo idioma
+    </a>
+  </div>
 
-  <table border="1">
-    <thead>
-    <tr>
-      <th>Nombre</th>
-      <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="idioma : ${idiomas}">
-      <td th:text="${idioma.nombre}">Idioma</td>
-      <td>
-        <a th:href="@{'/idiomas/editar/' + ${idioma.id}}">Editar</a> |
-        <a th:href="@{'/idiomas/eliminar/' + ${idioma.id}}"
-           onclick="return confirm('¿Estás seguro de eliminar este idioma?');">Eliminar</a>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-</div>
+  <!-- Tabla centrada y estilizada -->
+  <div class="bg-white rounded shadow overflow-hidden">
+    <table class="w-full text-sm text-left">
+      <thead class="bg-indigo-600 text-white">
+      <tr>
+        <th class="px-4 py-2">Idioma</th>
+        <th class="px-4 py-2 text-center">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="idioma : ${idiomas}" class="border-b hover:bg-gray-50">
+        <td class="px-4 py-2" th:text="${idioma.nombre}">Español</td>
+        <td class="px-4 py-2 text-center space-x-2">
+          <a th:href="@{'/idiomas/editar/' + ${idioma.id}}"
+             class="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded">
+            ✏️
+          </a>
+          <a th:href="@{'/idiomas/eliminar/' + ${idioma.id}}"
+             onclick="return confirm('¿Eliminar este idioma?');"
+             class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">
+            🗑️
+          </a>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(idiomas)}">
+        <td colspan="2" class="text-center py-4 text-gray-500">No hay idiomas registrados.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 
-<div sec:authorize="!hasRole('ADMIN')">
-  <p>No tienes permiso para ver esta sección.</p>
 </div>
 
 </body>

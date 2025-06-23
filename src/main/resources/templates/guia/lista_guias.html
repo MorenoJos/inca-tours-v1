@@ -4,75 +4,97 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Guías</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
 
-<h2>Guías Registrados</h2>
+<!-- Contenedor principal -->
+<div class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow">
 
-<div th:if="${param.exito}">
-    <p style="color: green;">¡Guía registrado correctamente!</p>
-</div>
-<div th:if="${param.editado}">
-    <p style="color: green;">¡Guía actualizado correctamente!</p>
-</div>
-<div th:if="${param.eliminado}">
-    <p style="color: green;">¡Guía eliminado correctamente!</p>
-</div>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+        <h1 class="text-2xl font-bold text-indigo-700">🧭 Guías Registrados</h1>
+        <a th:href="@{/}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">
+            🏠 Inicio
+        </a>
+    </div>
 
-<p>Usuario: <span sec:authentication="name"></span> |
-    Rol: <span sec:authentication="principal.authorities"></span></p>
+    <!-- Fragmento de mensajes -->
+    <div th:replace="~{fragmentos/mensajes :: mensajes}"></div>
 
-<div sec:authorize="hasRole('ADMIN') or hasRole('USER')">
+    <!-- Botón para registrar guía -->
+    <div class="text-right mb-4" sec:authorize="hasRole('ADMIN') or hasRole('USER')">
+        <a th:href="@{/guias/nuevo}"
+           class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded shadow transition">
+            ➕ Registrar nuevo guía
+        </a>
+    </div>
 
-    <a th:href="@{/guias/nuevo}">Registrar nuevo guía</a>
-    <br/><br/>
-
-    <table border="1">
-        <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>DNI</th>
-            <th>Correo</th>
-            <th>Teléfono</th>
-            <th>Idiomas</th>
-            <th>Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="guia : ${guias}">
-            <td th:text="${guia.nombre}">Nombre</td>
-            <td th:text="${guia.dni}">DNI</td>
-            <td th:text="${guia.correo}">Correo</td>
-            <td th:text="${guia.telefono}">Teléfono</td>
-            <td>
-                <ul>
-                    <li th:each="idioma : ${guia.idiomas}" th:text="${idioma.nombre}">Idioma</li>
-                </ul>
-            </td>
-            <td>
-                <a th:href="@{'/guias/editar/' + ${guia.id}}">Editar</a> |
-                <a th:href="@{'/guias/eliminar/' + ${guia.id}}"
-                   onclick="return confirm('¿Estás seguro de que deseas eliminar este guía?');">Eliminar</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- Tabla -->
+    <div class="overflow-x-auto bg-white shadow rounded border">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-indigo-600 text-white">
+            <tr>
+                <th class="px-4 py-2">Nombre</th>
+                <th class="px-4 py-2">DNI</th>
+                <th class="px-4 py-2">Correo</th>
+                <th class="px-4 py-2">Teléfono</th>
+                <th class="px-4 py-2">Idiomas</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="guia : ${guias}" class="border-t hover:bg-gray-50">
+                <td class="px-4 py-2" th:text="${guia.nombre}">Juan Pérez</td>
+                <td class="px-4 py-2" th:text="${guia.dni}">12345678</td>
+                <td class="px-4 py-2" th:text="${guia.correo}">juan@email.com</td>
+                <td class="px-4 py-2" th:text="${guia.telefono}">987654321</td>
+                <td class="px-4 py-2">
+                    <ul class="list-disc list-inside">
+                        <li th:each="idioma : ${guia.idiomas}" th:text="${idioma.nombre}">Español</li>
+                    </ul>
+                </td>
+                <td class="px-4 py-2 text-center space-x-2">
+                    <a th:href="@{'/guias/editar/' + ${guia.id}}"
+                       class="text-yellow-600 hover:underline font-medium text-sm">Editar</a>
+                    <a th:href="@{'/guias/eliminar/' + ${guia.id}}"
+                       onclick="return confirm('¿Estás seguro de eliminar este guía?');"
+                       class="text-red-600 hover:underline font-medium text-sm">Eliminar</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(guias)}">
+                <td colspan="6" class="text-center py-4 text-gray-500">No hay guías registrados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginación -->
-    <div>
+    <div class="mt-6 flex justify-center items-center gap-1 text-sm text-gray-700" th:if="${totalPaginas > 1}">
+        <span th:if="${paginaActual > 0}">
+            <a th:href="@{'/guias/lista?page=' + (${paginaActual - 1})}"
+               class="px-3 py-1 border rounded hover:bg-indigo-100 transition">«</a>
+        </span>
+
         <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
-            <a th:href="@{'/guias/lista?page=' + ${i}}" th:text="${i + 1}"
-               th:class="${i == paginaActual} ? 'actual' : ''">Número</a>
-            <span th:if="${i < totalPaginas - 1}"> | </span>
+            <a th:href="@{'/guias/lista?page=' + ${i}}"
+               th:text="${i + 1}"
+               th:classappend="${i == paginaActual} ? 'bg-indigo-500 text-white' : 'bg-white text-indigo-600'"
+               class="inline-block px-3 py-1 border rounded hover:bg-indigo-100 transition">1</a>
+        </span>
+
+        <span th:if="${paginaActual < totalPaginas - 1}">
+            <a th:href="@{'/guias/lista?page=' + (${paginaActual + 1})}"
+               class="px-3 py-1 border rounded hover:bg-indigo-100 transition">»</a>
         </span>
     </div>
 
 </div>
 
-<div sec:authorize="!isAuthenticated()">
-    <p>No tienes permiso para ver esta página. Por favor,
-        <a th:href="@{/login}">inicia sesión</a>.</p>
-</div>
+<!-- Footer -->
+<footer class="text-center text-sm text-gray-500 py-4 mt-auto">
+    © 2025 Inca Tours. Todos los derechos reservados.
+</footer>
 
 </body>
 </html>

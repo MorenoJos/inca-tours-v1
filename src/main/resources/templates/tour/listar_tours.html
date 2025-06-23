@@ -2,106 +2,98 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <meta charset="UTF-8" />
     <title>Lista de Tours</title>
-    <meta charset="UTF-8">
-    <style>
-        .pagina-activa {
-            font-weight: bold;
-            color: green;
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen font-sans flex flex-col">
 
-<!-- 👋 Bienvenida y roles -->
-<p>Bienvenido, <strong><span sec:authentication="name"></span></strong>
-    | Rol: <span sec:authentication="principal.authorities"></span>
-</p>
+<!-- Contenedor principal centrado y ancho amplio -->
+<div class="max-w-7xl mx-auto px-6 py-6 flex-grow">
 
-<h1>Lista de Tours Registrados</h1>
-
-<!-- Mensajes de feedback -->
-<div th:if="${param.exito}">
-    <p style="color: green;">✅ ¡Tour registrado correctamente!</p>
-</div>
-<div th:if="${param.editado}">
-    <p style="color: blue;">✏️ ¡Tour editado exitosamente!</p>
-</div>
-<div th:if="${param.eliminado}">
-    <p style="color: red;">🗑️ ¡Tour eliminado exitosamente!</p>
-</div>
-<div th:if="${param.error}">
-    <p style="color: red;">Ocurrió un error. Intenta nuevamente.</p>
-</div>
-
-<!-- Tabla de tours -->
-<table border="1">
-    <thead>
-    <tr>
-        <th>Nombre</th>
-        <th>Tipo</th>
-        <th>Duración</th>
-        <th>Pasajeros</th>
-        <th>Fecha y Hora de Inicio</th>
-        <th>Estado</th>
-        <th>Guía Asignado</th>
-        <th>Editar</th>
-        <th>Eliminar</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="tour : ${toursPage.content}">
-        <td th:text="${tour.nombre}"></td>
-        <td th:text="${tour.tipo}"></td>
-        <td th:text="|${tour.duracionHoras}h|"></td>
-        <td th:text="${tour.cantidadPasajeros}"></td>
-        <td th:text="${#temporals.format(tour.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></td>
-        <td th:text="${tour.estado}"></td>
-        <td th:text="${tour.guiaAsignado != null ? tour.guiaAsignado.nombre : 'No asignado'}"></td>
-        <td><a th:href="@{'/tours/editar/' + ${tour.id}}">Editar</a></td>
-        <td><a th:href="@{'/tours/eliminar/' + ${tour.id}}" onclick="return confirm('¿Estás seguro de eliminar este tour?');">Eliminar</a></td>
-    </tr>
-    </tbody>
-</table>
-
-<!-- Botón para registrar nuevo tour -->
-<div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
-    <br/>
-    <a th:href="@{/tours/nuevo}">Registrar nuevo tour</a>
-</div>
-
-<!-- Paginación -->
-<div th:if="${totalPages > 1}" style="margin-top: 20px;">
-    <p>Página:
-        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/tours/lista(page=${i})}"
-               th:text="${i + 1}"
-               th:class="${i == currentPage} ? 'pagina-activa' : ''"
-               style="margin: 0 5px;"></a>
-        </span>
-    </p>
-
-    <div>
-        <span th:if="${currentPage > 0}">
-            <a th:href="@{/tours/lista(page=${currentPage - 1})}">← Anterior</a>
-        </span>
-        |
-        <span th:if="${currentPage < totalPages - 1}">
-            <a th:href="@{/tours/lista(page=${currentPage + 1})}">Siguiente →</a>
-        </span>
+    <!-- Header estilizado -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+        <h1 class="text-2xl font-bold text-indigo-700">🚍 Tours Registrados</h1>
+        <a th:href="@{/}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">
+            🏠 Inicio
+        </a>
     </div>
+
+    <!-- Fragmento de mensajes -->
+    <div th:replace="~{fragmentos/mensajes :: mensajes}"></div>
+
+    <!-- Botón crear nuevo tour -->
+    <div class="mb-4 text-right" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/tours/nuevo}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+            ➕ Crear nuevo tour
+        </a>
+    </div>
+
+    <!-- Tabla con scroll horizontal si necesario -->
+    <div class="overflow-x-auto bg-white rounded shadow border">
+        <table class="min-w-max w-full text-sm text-left">
+            <thead class="bg-indigo-600 text-white">
+            <tr>
+                <th class="px-4 py-2">Nombre</th>
+                <th class="px-4 py-2">Tipo</th>
+                <th class="px-4 py-2">Duración</th>
+                <th class="px-4 py-2">Pasajeros</th>
+                <th class="px-4 py-2">Inicio</th>
+                <th class="px-4 py-2">Estado</th>
+                <th class="px-4 py-2">Guía</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tour : ${toursPage.content}" class="border-t hover:bg-gray-50">
+                <td class="px-4 py-2" th:text="${tour.nombre}">Nombre</td>
+                <td class="px-4 py-2" th:text="${tour.tipo}">Tipo</td>
+                <td class="px-4 py-2" th:text="${tour.duracionHoras + ' h'}">Duración</td>
+                <td class="px-4 py-2" th:text="${tour.cantidadPasajeros}">Pasajeros</td>
+                <td class="px-4 py-2" th:text="${#temporals.format(tour.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}">Inicio</td>
+                <td class="px-4 py-2" th:text="${tour.estado}">Estado</td>
+                <td class="px-4 py-2" th:text="${tour.guiaAsignado != null ? tour.guiaAsignado.nombre : 'No asignado'}">Guía</td>
+                <td class="px-4 py-2 text-center space-x-2">
+                    <a th:href="@{'/tours/editar/' + ${tour.id}}"
+                       class="text-yellow-600 hover:underline font-medium text-sm">Editar</a>
+                    <a th:href="@{'/tours/eliminar/' + ${tour.id}}"
+                       onclick="return confirm('¿Seguro que deseas eliminar este tour?');"
+                       class="text-red-600 hover:underline font-medium text-sm">Eliminar</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(toursPage.content)}">
+                <td colspan="8" class="text-center py-4 text-gray-500">No hay tours registrados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="mt-6 flex justify-center items-center gap-1 text-sm text-gray-700" th:if="${totalPages > 1}">
+    <span th:if="${currentPage > 0}">
+      <a th:href="@{'/tours/lista?page=' + (${currentPage - 1})}"
+         class="px-3 py-1 border rounded hover:bg-indigo-100 transition">«</a>
+    </span>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+      <a th:href="@{'/tours/lista?page=' + ${i}}"
+         th:text="${i + 1}"
+         th:classappend="${i == currentPage} ? 'bg-indigo-500 text-white' : 'bg-white text-indigo-600'"
+         class="inline-block px-3 py-1 border rounded hover:bg-indigo-100 transition">1</a>
+    </span>
+
+        <span th:if="${currentPage < totalPages - 1}">
+      <a th:href="@{'/tours/lista?page=' + (${currentPage + 1})}"
+         class="px-3 py-1 border rounded hover:bg-indigo-100 transition">»</a>
+    </span>
+    </div>
+
 </div>
 
-<!-- Cerrar sesión -->
-<div sec:authorize="isAuthenticated()">
-    <br/>
-    <!--<a th:href="@{/logout}">Cerrar sesión</a>-->
-    <form th:action="@{/logout}" method="post" style="display:inline;">
-        <button type="submit" style="background:none;border:none;color:blue;text-decoration:underline;cursor:pointer;">Cerrar sesión</button>
-    </form>
-</div>
+<!-- Footer -->
+<footer class="text-center text-sm text-gray-500 py-4 bg-transparent">
+    © 2025 Inca Tours. Todos los derechos reservados.
+</footer>
 
 </body>
 </html>
-

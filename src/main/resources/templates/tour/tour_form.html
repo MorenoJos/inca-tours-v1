@@ -2,55 +2,111 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Registrar Tour</title>
+    <meta charset="UTF-8">
+    <title th:text="${tour.id != null} ? 'Editar Tour' : 'Registrar Tour'">Formulario Tour</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
 
-<h1 th:text="${tour.id != null} ? 'Editar Tour' : 'Registrar Tour'"></h1>
+<!-- Contenedor principal -->
+<div class="max-w-3xl w-full mx-auto px-4 py-6 flex-grow">
 
-<p>Bienvenido: <span sec:authentication="name"></span> | Rol: <span sec:authentication="principal.authorities"></span></p>
-
-<div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
-    <form th:action="@{/tours/guardar}" th:object="${tour}" method="post">
-
-        <label>Nombre:</label>
-        <input type="text" th:field="*{nombre}" required/><br/>
-        <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red;"></span>
-
-        <label>Tipo:</label>
-        <input type="text" th:field="*{tipo}" required/><br/>
-        <span th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}" style="color:red;"></span>
-
-        <label>Duración (horas):</label>
-        <input type="number" th:field="*{duracionHoras}" required/><br/>
-        <span th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}" style="color:red;"></span>
-
-        <label>Pasajeros:</label>
-        <input type="number" th:field="*{cantidadPasajeros}" required/><br/>
-        <span th:if="${#fields.hasErrors('cantidadPasajeros')}" th:errors="*{cantidadPasajeros}" style="color:red;"></span>
-
-        <label>Fecha y hora de inicio:</label>
-        <input type="datetime-local" th:field="*{fechaHoraInicio}" required/><br/>
-        <span th:if="${#fields.hasErrors('fechaHoraInicio')}" th:errors="*{fechaHoraInicio}" style="color:red;"></span>
-
-        <label>Guía asignado:</label>
-        <select th:field="*{guiaAsignado}">
-            <option th:each="g : ${guiaList}" th:value="${g.id}" th:text="${g.nombre}"></option>
-        </select><br/>
-        <span th:if="${#fields.hasErrors('guiaAsignado')}" th:errors="*{guiaAsignado}" style="color:red;"></span>
-
-        <label>Estado inicial:</label>
-        <select th:field="*{estado}">
-            <option th:each="estado : ${estadoList}" th:value="${estado}" th:text="${estado}"></option>
-        </select><br/>
-
-        <button type="submit">Guardar</button>
-    </form>
-
-    <div th:if="${param.exito}">
-        <p style="color: green;">¡Tour registrado correctamente!</p>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
+        <h1 class="text-2xl font-bold text-indigo-700" th:text="${tour.id != null} ? '✏️ Editar Tour' : '📝 Registrar Tour'">
+            Formulario Tour
+        </h1>
+        <a th:href="@{/}" class="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded shadow">
+            🏠 Inicio
+        </a>
     </div>
+
+    <!-- Fragmento de mensajes -->
+    <div th:replace="~{fragmentos/mensajes :: mensajes}"></div>
+
+    <!-- Formulario -->
+    <div class="bg-white p-6 rounded shadow border">
+        <form th:action="@{/tours/guardar}" th:object="${tour}" method="post" class="space-y-5">
+
+            <!-- Nombre -->
+            <div>
+                <label class="block font-medium text-gray-700">Nombre del tour:</label>
+                <input type="text" th:field="*{nombre}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Tipo -->
+            <div>
+                <label class="block font-medium text-gray-700">Tipo:</label>
+                <input type="text" th:field="*{tipo}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Duración y Pasajeros -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-medium text-gray-700">Duración (horas):</label>
+                    <input type="number" min="1" th:field="*{duracionHoras}" class="w-full border rounded px-3 py-2 mt-1" required>
+                    <p th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}" class="text-red-600 text-sm"></p>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700">Cantidad de pasajeros:</label>
+                    <input type="number" min="1" th:field="*{cantidadPasajeros}" class="w-full border rounded px-3 py-2 mt-1" required>
+                    <p th:if="${#fields.hasErrors('cantidadPasajeros')}" th:errors="*{cantidadPasajeros}" class="text-red-600 text-sm"></p>
+                </div>
+            </div>
+
+            <!-- Fecha y hora -->
+            <div>
+                <label class="block font-medium text-gray-700">Fecha y hora de inicio:</label>
+                <input type="datetime-local" th:field="*{fechaHoraInicio}" class="w-full border rounded px-3 py-2 mt-1" required>
+                <p th:if="${#fields.hasErrors('fechaHoraInicio')}" th:errors="*{fechaHoraInicio}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Guía -->
+            <div>
+                <label class="block font-medium text-gray-700">Guía asignado:</label>
+                <select th:field="*{guiaAsignado}" class="w-full border rounded px-3 py-2 mt-1">
+                    <option value="">-- Selecciona una guía --</option>
+                    <option th:each="g : ${guiaList}" th:value="${g.id}" th:text="${g.nombre}"></option>
+                </select>
+                <p th:if="${#fields.hasErrors('guiaAsignado')}" th:errors="*{guiaAsignado}" class="text-red-600 text-sm"></p>
+            </div>
+
+            <!-- Estado -->
+            <div>
+                <label class="block font-medium text-gray-700">Estado del tour:</label>
+                <select th:field="*{estado}" class="w-full border rounded px-3 py-2 mt-1">
+                    <option th:each="estado : ${estadoList}" th:value="${estado}" th:text="${estado}"></option>
+                </select>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-between items-center pt-4">
+                <!-- Botón de cancelar con confirmación -->
+                <button type="button"
+                        onclick="if(confirm('¿Seguro que deseas cancelar y volver a la lista de tours? Los cambios no guardados se perderán.')) window.location.href='/tours/lista';"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-5 py-2 rounded transition">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        th:text="${tour.id != null} ? 'Actualizar' : 'Guardar'"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded transition">
+                    Guardar
+                </button>
+            </div>
+
+        </form>
+    </div>
+
 </div>
+
+<!-- Footer -->
+<footer class="text-center text-sm text-gray-500 py-4 mt-auto">
+    © 2025 Inca Tours. Todos los derechos reservados.
+</footer>
 
 </body>
 </html>

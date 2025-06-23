@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio | Panel de Control</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans text-gray-800">
+
+<!-- Header -->
+<header class="bg-white shadow-md px-6 py-4 flex flex-col sm:flex-row justify-between items-center">
+    <div class="text-center sm:text-left">
+        <h1 class="text-2xl font-bold text-indigo-700">Inca Tours</h1>
+        <p class="text-sm text-gray-600">
+            Bienvenido, <strong th:text="${@seguridad.usuario.nombre}">Nombre Usuario</strong> |
+            Rol: <strong th:text="${@seguridad.usuario.rol}">ROL</strong>
+        </p>
+    </div>
+    <form th:action="@{/logout}" method="post" class="mt-2 sm:mt-0">
+        <button type="submit"
+                class="bg-red-100 hover:bg-red-200 text-red-700 font-medium px-4 py-2 rounded shadow transition">
+            Cerrar sesión
+        </button>
+    </form>
+</header>
+
+<!-- Fragmento para mensajes -->
+<div th:replace="fragmentos/mensajes :: mensajes"></div>
+
+<!-- Panel principal -->
+<main class="flex-grow max-w-6xl mx-auto px-4 py-8 space-y-10">
+
+    <!-- Navegación principal -->
+    <section>
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">🔍 Accesos rápidos</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Tours -->
+            <a th:href="@{/tours/lista}" class="dashboard-card bg-blue-100 hover:bg-blue-200 border-blue-300">
+                <h3>📌 Tours</h3>
+                <p>Consulta, crea o edita los tours registrados.</p>
+            </a>
+
+            <!-- Guías -->
+            <div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
+                <a th:href="@{/guias/lista}" class="dashboard-card bg-green-100 hover:bg-green-200 border-green-300">
+                    <h3>🧭 Guías</h3>
+                    <p>Gestiona los guías turísticos asignados.</p>
+                </a>
+            </div>
+
+            <!-- Idiomas -->
+            <div sec:authorize="hasRole('USER') or hasRole('ADMIN')">
+                <a th:href="@{/idiomas/lista}" class="dashboard-card bg-yellow-100 hover:bg-yellow-200 border-yellow-300">
+                    <h3>🌍 Idiomas</h3>
+                    <p>Administra los idiomas que hablan los guías.</p>
+                </a>
+            </div>
+
+            <!-- Usuarios -->
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/usuarios/lista}" class="dashboard-card bg-purple-100 hover:bg-purple-200 border-purple-300">
+                    <h3>👤 Usuarios</h3>
+                    <p>Solo administradores pueden gestionar usuarios.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tours de hoy -->
+    <section>
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">📅 Tours programados para hoy</h2>
+
+        <div th:if="${#lists.isEmpty(toursHoy)}" class="bg-white p-4 rounded shadow text-gray-600">
+            No hay tours programados para hoy.
+        </div>
+
+        <div th:if="${!#lists.isEmpty(toursHoy)}" class="overflow-x-auto bg-white shadow rounded-lg border">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-indigo-100 text-indigo-700">
+                <tr>
+                    <th class="px-4 py-2">Nombre</th>
+                    <th class="px-4 py-2">Hora de inicio</th>
+                    <th class="px-4 py-2">Duración</th>
+                    <th class="px-4 py-2">Guía</th>
+                    <th class="px-4 py-2">Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="tour : ${toursHoy}" class="border-t hover:bg-gray-50">
+                    <td class="px-4 py-2" th:text="${tour.nombre}"></td>
+                    <td class="px-4 py-2" th:text="${#temporals.format(tour.fechaHoraInicio, 'HH:mm')}"></td>
+                    <td class="px-4 py-2" th:text="${tour.duracionHoras + ' h'}"></td>
+                    <td class="px-4 py-2" th:text="${tour.guiaAsignado?.nombre}">No asignado</td>
+                    <td class="px-4 py-2" th:text="${tour.estado}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="text-center text-sm text-gray-500 py-6 mt-auto">
+    © 2025 Inca Tours. Todos los derechos reservados.
+</footer>
+
+<!-- Estilo para las cards -->
+<style>
+    .dashboard-card {
+        display: block;
+        padding: 1.5rem;
+        border: 1px solid;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: background 0.2s ease-in-out;
+    }
+    .dashboard-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .dashboard-card p {
+        font-size: 0.9rem;
+        color: #4b5563;
+    }
+</style>
+
+</body>
+</html>
